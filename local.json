@@ -1,0 +1,24 @@
+{
+    "contacts": {
+        "jorge": {
+            "name": "jorge",
+            "age":  "23",
+            "img": "thing1.jpg"
+        },
+        "luis": {
+            "name": "luis",
+            "age":  "23",
+            "img": "thing2.jpg"
+        },
+        "anibal": {
+            "name": "anibal",
+            "age":  "25",
+            "img": "thing3.jpg"
+        },
+        "ariel": {
+            "name": "ariel",
+            "age":  "20",
+            "img": "thing4.jpg"
+        }
+    }
+}
