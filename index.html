@@ -7,7 +7,9 @@
         <link rel="stylesheet" href="main.css">
     </head>
     <body>
-
+        <div class="head">
+            <span>Hello</span>
+        </div>
         <div class="container" ></div>
         <div class="inputs">
             <form id="add-contact">
@@ -43,28 +45,39 @@
                 //alert(img.height != 0);
             }*/
 
-
-
-
-
             function insertContacts(contact) {
-                var img = $('<img>', {
+
+                var colors = {
+                    1:'#70afcc',
+                    2:'#66a1bd',
+                    3:'#5790ab',
+                    4:'#4d8199'
+                    },
+                    number = $('.container');
+                    level = Math.floor((number[0].childNodes.length + 3)/3);
+                    img = $('<img>', {
                                 src: contact.img,
-                                class: 'pic',
+                                class: 'pic center',
                                 draggable: 'false',
                                 alt: contact.name
                             }),
-                    name = $('<div>').text(contact.name).addClass('center'),
-                    age = $('<div>').text(contact.age).addClass('center'),
-                    close = $('<img>').attr('src', 'close.png').addClass('close-img').click(function () {
+                    name = $('<div>')
+                                .text(contact.name)
+                                .addClass('center'),
+                    age = $('<div>')
+                                .text(contact.age)
+                                .addClass('center'),
+                    close = $('<img>')
+                                .attr('src', 'close.png')
+                                .addClass('close-img')
+                                .mousedown(function () {
                         this.parentNode.remove();
                     }),
-                    content = $('<div>').addClass('content').append(close, img, name, age);
-                /*$(content + ":after").addRule({
-                    content: " alsdmksaldasdkasdlsad klasd sa",
-                    color: "red"
-                });*/
-                $('.container').append(content);
+                    content = $('<div>')
+                                .addClass('content')
+                                .css('background-color', (level < 5)? colors[level]: colors[4])
+                                .append(close, img, name, age);
+                number.append(content);
             }
 
             $("#add-contact").submit(function(e){
@@ -95,80 +108,37 @@
             });
 
 
-            (function($) {
-                $.fn.drags = function(opt) {
 
-                    opt = $.extend({
-                        handle: ".conent",
-                        cursor: "move",
-                        draggableClass: "draggable",
-                        activeHandleClass: "active-handle"
-                    }, opt);
 
-                    var $selected = null;
-                    var $elements = (opt.handle === "") ? this : this.find(opt.handle);
-
-                    $elements.css('cursor', opt.cursor).on("mousedown", function(e) {
-                        if(opt.handle === "") {
-                            $selected = $(this);
-                            $selected.addClass(opt.draggableClass);
-                        } else {
-                            $selected = $(this).parent();
-                            $selected.addClass(opt.draggableClass).find(opt.handle).addClass(opt.activeHandleClass);
-                        }
-                        var drg_h = $selected.outerHeight(),
-                                drg_w = $selected.outerWidth(),
-                                pos_y = $selected.offset().top + drg_h - e.pageY,
-                                pos_x = $selected.offset().left + drg_w - e.pageX;
-                        $(document).on("mousemove", function(e) {
-                            $selected.offset({
-                                top: e.pageY + pos_y - drg_h,
-                                left: e.pageX + pos_x - drg_w
-                            });
-                        }).on("mouseup", function() {
-                            $(this).off("mousemove"); // Unbind events from document
-                            if ($selected !== null) {
-                                $selected.removeClass(opt.draggableClass);
-                                $selected = null;
-                            }
-                        });
-                        e.preventDefault(); // disable selection
-                    }).on("mouseup", function() {
-                        if(opt.handle === "") {
-                            $selected.removeClass(opt.draggableClass);
-                        } else {
-                            $selected.removeClass(opt.draggableClass)
-                                    .find(opt.handle).removeClass(opt.activeHandleClass);
-                        }
-                        $selected = null;
-                    });
-                    return this;
-                };
-            })(jQuery);
-
-/*
             $(document).ready(function() {
-                var $dragging = null;
+                var $dragging = null,
+                        offset_x,
+                        offset_y,
+                        page_x,
+                        page_y;
                 $(document.body).on("mousemove", function(e) {
                     if ($dragging) {
                         $dragging.offset({
-                            top: e.pageY,
-                            left: e.pageX
+                            top: e.pageY - offset_y,
+                            left: e.pageX - offset_x
                         });
                     }
                 });
-
-
                 $(document.body).on("mousedown", ".content", function (e) {
-
                     $dragging = $(e.target);
+                    offset_x = e.offsetX;
+                    offset_y = e.offsetY;
+                    page_x = e.pageX;
+                    page_y = e.pageY;
+                    $(document.body).css('cursor', 'move');
+                    console.log(e);
                 });
-
                 $(document.body).on("mouseup", function (e) {
+                    $(document.body).css('cursor', 'default');
                     $dragging = null;
                 });
             });
-*/
+
         </script>
     </body>
 </html>
