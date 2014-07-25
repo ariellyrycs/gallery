@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta charset="UTF-8">
         <title>gallery</title>
+        <link rel="stylesheet" href="reset.css"/>
         <link rel="stylesheet" href="main.css">
     </head>
     <body>
@@ -11,28 +12,7 @@
             <span>Hello</span>
         </div>
         <div class="container" ></div>
-        <div class="inputs">
-            <form id="add-contact">
-                <fieldset>
-                    <div class="form-group">
-                        <label class="control-label">Name</label>
-                        <input class="form-control" type="text" placeholder="Name">
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label" >Age</label>
-                        <input class="form-control" type="text" placeholder="Age">
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label">Image Url</label>
-                        <input class="form-control" type="text" placeholder="Image Url"/>
-                    </div>
-                    <div class="form-group">
-                        <button class="form-control" type="submit" >Add</button>
-                    </div>
 
-                </fieldset>
-            </form>
-        </div>
         <script src="jquery-1.11.0.min.js"></script>
         <script type="application/javascript">
             var parse_url = function (url) {
@@ -43,9 +23,18 @@
                 img.src = url;
                 console.dir(img.width);
                 //alert(img.height != 0);
-            }*/
+            }*
+            */
 
-            function insertContacts(contact) {
+            var elementId = 0;
+
+            function insertContacts(contact, position, that) {
+                /*name = $('<div>')
+                        .text(contact.name)
+                        age = $('<div>')
+                                .text(contact.age)
+                        */
+
 
                 var colors = {
                     1:'#70afcc',
@@ -53,46 +42,118 @@
                     3:'#5790ab',
                     4:'#4d8199'
                     },
-                    number = $('.container');
-                    level = Math.floor((number[0].childNodes.length + 3)/3);
+                    defaultInfo = {
+                        "title": "title",
+                        "time":  "time",
+                        "img": "default.png"
+                    },
+                    number = $('.container'),
+                    level = Math.floor((number[0].childNodes.length + 3)/3),
+                    record = $('<div>')
+                            .addClass('record')
+                           /* .append(
+                                    $('<span>').text(elementId),
+                                    $('<span>').text((contact.title)? contact.title: defaultInfo.title),
+                                    $('<span>').text((contact.time)? contact.time: defaultInfo.time)
+                            ),*/
                     img = $('<img>', {
                                 src: contact.img,
-                                class: 'pic center',
-                                draggable: 'false',
+                                class: 'pic',
                                 alt: contact.name
                             }),
-                    name = $('<div>')
-                                .text(contact.name)
-                                .addClass('center'),
-                    age = $('<div>')
-                                .text(contact.age)
-                                .addClass('center'),
-                    close = $('<img>')
-                                .attr('src', 'close.png')
-                                .addClass('close-img')
-                                .mousedown(function () {
-                        this.parentNode.remove();
-                    }),
+                    imgDiv = $('<div>').append(img).addClass('imgDiv'),
                     content = $('<div>')
+                                .attr('id', elementId)
                                 .addClass('content')
                                 .css('background-color', (level < 5)? colors[level]: colors[4])
-                                .append(close, img, name, age);
-                number.append(content);
+                                .append(record, imgDiv)
+                                .dblclick(function () {
+
+                                    var input = $('<div>')
+                                            .addClass('form-group');
+                                    var button = input.clone()
+                                                    .append( $('<button>')
+                                                        .addClass('form-control')
+                                                        .attr('type', 'submit')
+                                                        .text('add')
+                                            );
+                                    console.log(button);
+                                    input.append($('<label>')
+                                                    .addClass('control-label'),
+                                                $('<input>')
+                                                    .addClass('form-control')
+                                                    .attr('type', 'text'));
+                                    var fieldset = $('<fieldset>')
+                                            .append(input.clone()
+                                                        .find('label')
+                                                            .text('Name')
+                                                            .end()
+                                                        .find('input')
+                                                            .attr('placeholder', 'Time'),
+                                                    input.clone()
+                                                        .find('label')
+                                                            .text('Name')
+                                                            .end()
+                                                        .find('input')
+                                                            .attr('placeholder', 'Time'),
+                                                    input.clone()
+                                                        .find('label')
+                                                            .text('Name')
+                                                            .end()
+                                                        .find('input')
+                                                            .attr('placeholder', 'Time'),
+                                                    button
+                                            );
+                                    var form = $('<form>')
+                                            .submit(function (e){
+                                                var info = {};
+                                                e.preventDefault();
+                                                info['name'] = e.target[1].value;
+                                                info['age'] = e.target[2].value;
+                                                info['img'] = e.target[3].value;
+                                                if(info.img === '' || info.name === '' || !parse_url(info.img) || !typeof info.name === 'string' || isNaN(parseInt(info.age))) {
+                                                    alert('incorrect');
+                                                    return false;
+                                                }
+                                                $('input').val('');
+                                                insertContacts(info);
+                                            }).append(fieldset);
+
+                                    var edit = $('<div>')
+                                            .addClass('inputs')
+                                            .append(form);
+                                $(this).append(edit);
+                                })
+                                .mouseenter( function () {
+                                    var icons = $('<div>')
+                                                .addClass('hoverDiv')
+                                                .append($('<div>')
+                                                    .mousedown(function () {
+                                                        insertContacts(defaultInfo, 'before', this);
+                                                    }), $('<div>')
+                                                    .mousedown(function () {
+                                                        this.parentNode.parentNode.remove();
+                                                    }), $('<div>')
+                                                    .mousedown(function () {
+                                                        insertContacts(defaultInfo, 'after', this);
+                                                    }));
+                                    $(this).append(icons);
+                            } ).mouseleave( function () {
+                                $(this).find('.hoverDiv').remove();
+                            });
+                if(position && that){
+                    if(position === 'before'){
+                        $(content).insertBefore( $('#' + that.parentNode.parentNode.id ) );
+                    }else if(position === 'after') {
+                        $('#' + that.parentNode.parentNode.id ).after( $(content) );
+                    }
+                } else {
+                    //console.log(content);
+                    number.append(content);
+                }
+                elementId += 1;
             }
 
-            $("#add-contact").submit(function(e){
-                var info = {};
-                e.preventDefault();
-                info['name'] = e.target[1].value;
-                info['age'] = e.target[2].value;
-                info['img'] = e.target[3].value;
-                if(info.img === '' || info.name === '' || !parse_url(info.img) || !typeof info.name === 'string' || isNaN(parseInt(info.age))) {
-                    alert('incorrect');
-                    return false;
-                }
-                $('input').val('');
-                insertContacts(info);
-            });
             $.ajax({
                 url: "local.json",
                 success: function (data) {
@@ -100,7 +161,6 @@
                     for (var contact in contacts){
                         if(contacts.hasOwnProperty(contact)){
                             contacts[contact].img = 'img/' + contacts[contact].img;
-                            console.log(contact);
                             insertContacts(contacts[contact]);
                         }
                     }
@@ -110,12 +170,17 @@
 
 
 
+
+
+/*
             $(document).ready(function() {
                 var $dragging = null,
                         offset_x,
                         offset_y,
-                        page_x,
-                        page_y;
+                        parent,
+                        pagePointerX,
+                        pagePointerY;
+
                 $(document.body).on("mousemove", function(e) {
                     if ($dragging) {
                         $dragging.offset({
@@ -125,19 +190,41 @@
                     }
                 });
                 $(document.body).on("mousedown", ".content", function (e) {
+                    $(document.body).css('cursor', 'move');
                     $dragging = $(e.target);
+                    $dragging.find('.hoverDiv').remove();
                     offset_x = e.offsetX;
                     offset_y = e.offsetY;
-                    page_x = e.pageX;
-                    page_y = e.pageY;
-                    $(document.body).css('cursor', 'move');
-                    console.log(e);
+                    pagePointerX = e.pageX;
+                    pagePointerY = e.pageY;
+                    parent = e.target.parentNode.childNodes;
                 });
                 $(document.body).on("mouseup", function (e) {
+                    var parent2 = e.target.parentNode.childNodes,
+                        element,
+                    differenceX = pagePointerX - e.pageX,
+                    differenceY = pagePointerY - e.pageY;
+
+                    //console.log(differenceX + ' ' + differenceY);
+                    //console.log(e);
+                    //console.log(parent2);
+                    //console.log(e.pageX, e.pageY);
                     $(document.body).css('cursor', 'default');
+
+                    for(element in parent){
+                        var t = element.offsetX + element.offsetWidth;
+                    }
+
+
+                    $dragging.css('position', 'static');
+
                     $dragging = null;
                 });
-            });
+            });*/
+            /*$(".container").hover(function(){
+             //var id = $(this).attr("id");
+             $( $dragging ).insertBefore( this );
+             });*/
 
         </script>
     </body>
