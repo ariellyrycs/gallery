@@ -9,7 +9,9 @@
     </head>
     <body>
         <div class="head">
-            <span>Hello</span>
+            <div>
+                <h1>My Playlist - {<label id="no">#</label> of songs} songs</h1>
+            </div>
         </div>
         <div class="container" ></div>
 
@@ -17,6 +19,24 @@
         <script type="application/javascript">
             var parse_url = function (url) {
                 return /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/.test(url);
+            }
+            var refreshAttr = function () {
+                var elements = $('.container')[0].childNodes,
+                    lengthItem = elements.length + 3,
+                    i,
+                    level,
+                    colors = {
+                        1:'#70afcc',
+                        2:'#66a1bd',
+                        3:'#5790ab',
+                        4:'#4d8199'
+                    };
+                for(i = 0; i < lengthItem; i += 1) {
+                    level = (i < 14 )? Math.floor((i + 3)/3): 4;
+                    $(elements[i]).css('background-color', colors[level]);
+                    $(elements[i]).find('.songNumber').html(i + 1);
+                }
+                $('#no').html(lengthItem - 3);
             }
             /*var IsValidImageUrl = function (url) {
                 var img = img || new Image();
@@ -27,104 +47,112 @@
             */
 
             var elementId = 0;
-
             function insertContacts(contact, position, that) {
-                /*name = $('<div>')
-                        .text(contact.name)
-                        age = $('<div>')
-                                .text(contact.age)
-                        */
 
 
-                var colors = {
-                    1:'#70afcc',
-                    2:'#66a1bd',
-                    3:'#5790ab',
-                    4:'#4d8199'
-                    },
-                    defaultInfo = {
-                        "title": "title",
-                        "time":  "time",
+                var defaultInfo = {
+                        "title": "{title}",
+                        "time":  "{time}",
                         "img": "default.png"
                     },
                     number = $('.container'),
-                    level = Math.floor((number[0].childNodes.length + 3)/3),
+                    recordText = $('<div>').append($('<h2>').html('<label class="songNumber">' + (elementId + 1) + '</label>. <label class="songTitle">' + contact.title +
+                            '</label> - <label class="songTime">' + contact.time  + '</label>'
+                    )),
                     record = $('<div>')
                             .addClass('record')
-                           /* .append(
-                                    $('<span>').text(elementId),
-                                    $('<span>').text((contact.title)? contact.title: defaultInfo.title),
-                                    $('<span>').text((contact.time)? contact.time: defaultInfo.time)
-                            ),*/
+                            .append(recordText),
                     img = $('<img>', {
                                 src: contact.img,
                                 class: 'pic',
                                 alt: contact.name
                             }),
-                    imgDiv = $('<div>').append(img).addClass('imgDiv'),
+                    imgDiv = $('<div>')
+                                .append(img)
+                                .addClass('imgDiv'),
+                    displayInfo = $('<div>')
+                                .addClass('contentInfo')
+                                .append(record, imgDiv),
                     content = $('<div>')
                                 .attr('id', elementId)
                                 .addClass('content')
-                                .css('background-color', (level < 5)? colors[level]: colors[4])
-                                .append(record, imgDiv)
+                                .append(displayInfo)
                                 .dblclick(function () {
-
-                                    var input = $('<div>')
-                                            .addClass('form-group');
-                                    var button = input.clone()
+                                    if($(this).find('.contentInfo').length !== 1){
+                                        return;
+                                    }
+                                    var close = $('<img>', {
+                                            src: 'cerrar.png',
+                                            class : 'close',
+                                            alt : 'close'
+                                        }).click(function (e) {
+                                            $(e.target.parentNode.nextSibling).css('display', 'block');
+                                            this.parentNode.remove();
+                                        }),
+                                        input = $('<div>')
+                                                .addClass('form-group'),
+                                        button = input.clone()
                                                     .append( $('<button>')
                                                         .addClass('form-control')
                                                         .attr('type', 'submit')
                                                         .text('add')
-                                            );
-                                    console.log(button);
-                                    input.append($('<label>')
-                                                    .addClass('control-label'),
-                                                $('<input>')
+                                                );
+                                    input.append($('<input>')
                                                     .addClass('form-control')
-                                                    .attr('type', 'text'));
+                                                    .attr('type', 'text')
+                                                );
                                     var fieldset = $('<fieldset>')
                                             .append(input.clone()
-                                                        .find('label')
-                                                            .text('Name')
-                                                            .end()
                                                         .find('input')
-                                                            .attr('placeholder', 'Time'),
+                                                            .attr('placeholder', 'Title')
+                                                            .attr('type', 'text')
+                                                            .end(),
                                                     input.clone()
-                                                        .find('label')
-                                                            .text('Name')
-                                                            .end()
                                                         .find('input')
-                                                            .attr('placeholder', 'Time'),
+                                                            .attr('placeholder', 'Time')
+                                                            .end(),
                                                     input.clone()
-                                                        .find('label')
-                                                            .text('Name')
-                                                            .end()
                                                         .find('input')
-                                                            .attr('placeholder', 'Time'),
+                                                            .attr('placeholder', 'Image Url')
+                                                            .attr('type', 'url')
+                                                            .end(),
                                                     button
                                             );
                                     var form = $('<form>')
-                                            .submit(function (e){
-                                                var info = {};
-                                                e.preventDefault();
-                                                info['name'] = e.target[1].value;
-                                                info['age'] = e.target[2].value;
-                                                info['img'] = e.target[3].value;
-                                                if(info.img === '' || info.name === '' || !parse_url(info.img) || !typeof info.name === 'string' || isNaN(parseInt(info.age))) {
-                                                    alert('incorrect');
-                                                    return false;
-                                                }
-                                                $('input').val('');
-                                                insertContacts(info);
-                                            }).append(fieldset);
+                                                .submit(function (e) {
+                                                    var info = {};
+                                                    e.preventDefault();
+                                                    info['name'] = e.target[1].value;
+                                                    info['time'] = e.target[2].value;
+                                                    info['img'] = e.target[3].value;
+                                                    if(info.img === '' || info.name === '' || !parse_url(info.img) || !typeof info.name === 'string' || isNaN(parseInt(info.time))) {
+                                                        alert('incorrect');
+                                                        return false;
+                                                    }
+                                                    $(e.target.parentNode.nextSibling)
+                                                            .find('.songTitle')
+                                                                .html(info['name'])
+                                                                .end()
+                                                            .find('.songTime')
+                                                                .html(info['time'])
+                                                                .end()
+                                                            .find('.pic')
+                                                                .attr('src', info['img']);
+                                                    $(e.target.parentNode.nextSibling).css('display', 'block');
+                                                    $(e.currentTarget.parentNode).remove();
+
+                                                }).append(fieldset);
 
                                     var edit = $('<div>')
-                                            .addClass('inputs')
-                                            .append(form);
-                                $(this).append(edit);
+                                                .addClass('contentInfo')
+                                                .append(close, form);
+                                    $(this).find('.contentInfo').css('display','none');
+                                    $(this).prepend(edit);
                                 })
                                 .mouseenter( function () {
+                                    if($(this.parentNode).find('.hoverDiv').length) {
+                                        return;
+                                    }
                                     var icons = $('<div>')
                                                 .addClass('hoverDiv')
                                                 .append($('<div>')
@@ -133,25 +161,27 @@
                                                     }), $('<div>')
                                                     .mousedown(function () {
                                                         this.parentNode.parentNode.remove();
+                                                        refreshAttr();
                                                     }), $('<div>')
                                                     .mousedown(function () {
                                                         insertContacts(defaultInfo, 'after', this);
                                                     }));
                                     $(this).append(icons);
+
                             } ).mouseleave( function () {
                                 $(this).find('.hoverDiv').remove();
                             });
                 if(position && that){
                     if(position === 'before'){
-                        $(content).insertBefore( $('#' + that.parentNode.parentNode.id ) );
+                        $(content).insertBefore($('#' + that.parentNode.parentNode.id));
                     }else if(position === 'after') {
                         $('#' + that.parentNode.parentNode.id ).after( $(content) );
                     }
                 } else {
-                    //console.log(content);
                     number.append(content);
                 }
                 elementId += 1;
+                refreshAttr();
             }
 
             $.ajax({
@@ -172,7 +202,7 @@
 
 
 
-/*
+            /*/*
             $(document).ready(function() {
                 var $dragging = null,
                         offset_x,
@@ -220,7 +250,7 @@
 
                     $dragging = null;
                 });
-            });*/
+            });
             /*$(".container").hover(function(){
              //var id = $(this).attr("id");
              $( $dragging ).insertBefore( this );

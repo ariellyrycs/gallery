@@ -1,23 +1,23 @@
 {
     "contacts": {
-        "jorge": {
-            "title": "jorge",
-            "time":  "23",
+        "areyouin": {
+            "title": "Are You In?",
+            "time":  "03:33",
             "img": "thing1.jpg"
         },
-        "luis": {
-            "title": "luis",
-            "time":  "23",
+        "Cassius": {
+            "title": "Cassius",
+            "time":  "04:44",
             "img": "thing2.jpg"
         },
-        "anibal": {
-            "title": "anibal",
-            "time":  "25",
+        "Everyday": {
+            "title": "Everyday",
+            "time":  "10:19",
             "img": "thing3.jpg"
         },
         "ariel": {
-            "title": "ariel",
-            "time":  "20",
+            "title": "Lies and Eyes",
+            "time":  "04:01",
             "img": "thing4.jpg"
         }
     }

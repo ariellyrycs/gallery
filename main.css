@@ -2,17 +2,27 @@ body > div{
     margin-right: auto;
     margin-left: auto;
     max-width: 960px;
-    width: 960px;
     min-width: 200px;
 }
 .head {
     height:247px;
     box-shadow:5px 0px 20px black;
-    padding-left: 42px;
-    padding-right: 42px;
+    padding: 1px 42px;
 }
+.head>div {
+    margin: 105px auto;
+}
+
 h1 {
-    margin: auto;
+    text-align: center;
+    font: message-box;
+    font-size: 2em;
+}
+h2 {
+    display: table;
+    font: message-box;
+    font-size: 1.5em;
+    font-size-adjust: none;
 }
 /*
 label abcad9
@@ -44,12 +54,19 @@ label abcad9
     display: inline-block;
     width: 288px;
     height: 288px;
+    opacity: 0.9;
     border-bottom-left-radius: 40px;
     border-bottom-right-radius: 40px;
     border-top-right-radius:  40px;
     border-top-left-radius:  40px;
     border-style: solid;
     border-width: 4px;
+}
+.content * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .record {
     width: 240px;
@@ -59,6 +76,7 @@ label abcad9
     pointer-events: none;
 }
 .record>div{
+    padding:18px 18px 16px 18px;
 
 }
 .pic{
@@ -73,33 +91,52 @@ label abcad9
     box-shadow: 0 0 5px #888;
 
 }
+.close {
+    margin-left: auto;
+    display: block;
+    height: 24px;
+    width: 24px;
+    padding:2px;
+}
+.close:hover {
+    height: 28px;
+    width: 28px;
+    padding:0px;
+}
 
 .imgDiv {
     padding-top: 9px;
     pointer-events: none;
 }
-.inputs {
-    position:relative;
-    top: -100px;
-    left: -100px;
+.contentInfo {
+    display: block;
+    width: 100%;
+    height: 286px;
+    padding: 1px;
+}
+
+.contentInfo>form {
+    height: 70%;
+    width: 70%;
+    margin: 15px 43px 43px 43px;
 }
 .form-group {
-    margin-top:20px;
-    max-width: 200px;
-
+    display: table-row;
+    height: 51px;
 }
 .control-label {
     font-size: 1.5em;
     margin-bottom: 10px;
 }
 .form-control {
-    width:100%;
-    height:30px;
+    margin-top: auto;
+    margin-right: auto;
+    height: 70%;
+    width: 200px;
 }
 fieldset {
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
+    height: 100%;
+    width: 100%;
 }
 
 .hoverDiv {
@@ -107,13 +144,13 @@ fieldset {
     width: 288px;
     height: 60px;
     position: relative;
-    top:40px;
-    display:inline-block;
+    top: -2px;
     box-shadow:5px 0px 20px black;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
     border-top-right-radius:  20px;
     border-top-left-radius:  20px;
+
 }
 
 .hoverDiv>div{
@@ -121,11 +158,11 @@ fieldset {
     height: 40px;
     width: 85px;
     margin-top: 10px;
-    display:inline-block;
+    display: table-cell;
+
 }
 .hoverDiv :nth-child(1) {
     background-position:  -286px -1809px;
-    float:left;
     cursor: pointer;
 }
 .hoverDiv :nth-child(2) {
@@ -134,6 +171,5 @@ fieldset {
 }
 .hoverDiv :nth-child(3) {
     background-position:  -286px -1809px;
-    float:right;
     cursor: pointer;
 }
