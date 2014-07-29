@@ -81,7 +81,7 @@ label abcad9
     height: 60px;
     background-color:#b8d8e6;
     margin: 15px auto;
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 .record>div{
     padding:18px 18px 16px 18px;
