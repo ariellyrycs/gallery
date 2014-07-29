@@ -2,7 +2,7 @@
  * Created by arobles on 7/28/14.
  */
 
-var createContent = (function ($){
+; var createContent = (function ($){
     var elementId = 0,
         defaultInfo = {
             "title": "{title}",
@@ -39,7 +39,7 @@ var createContent = (function ($){
         insertContacts = function (contact, position, that) {
             var number = $('.container'),
                 recordText = $('<div>')
-                    .append($('<h2>')
+                    .append($('<marquee>')
                         .html('<span class="songNumber">' + (elementId + 1) + '</span>. <span class="songTitle">' + contact.title +
                             '</span> - <span class="songTime">' + contact.time  + '</span>')),
                 record = $('<div>')
@@ -178,6 +178,17 @@ var createContent = (function ($){
     }
 }(jQuery));
 
+(function (data) {
+    var contacts = data.contacts;
+    for (var contact in contacts){
+        if(contacts.hasOwnProperty(contact)){
+            contacts[contact].img = 'img/' + contacts[contact].img;
+            createContent.insertContacts(contacts[contact]);
+        }
+    }
+
+}(data));
+
 
 (function($) {
     var $dragging = null,
@@ -185,18 +196,6 @@ var createContent = (function ($){
         offset_x,
         coordinates = [],
         indexPos;
-    $.ajax({
-        url: "js/local.json",
-        success: function (data) {
-            var contacts = data.contacts;
-            for (var contact in contacts){
-                if(contacts.hasOwnProperty(contact)){
-                    contacts[contact].img = 'img/' + contacts[contact].img;
-                    createContent.insertContacts(contacts[contact]);
-                }
-            }
-        }
-    });
     $(document.body).on("mousemove", function(e) {
         if ($dragging) {
             $dragging.offset({
