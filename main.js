@@ -40,10 +40,10 @@ var createContent = (function ($){
                 $(elements[i]).find('.songNumber').html(i + 1);
             }
             $('#no').html(lengthItem - 3);
-        }
-    removeOptions = function () {
-        $(this).find('.hoverDiv').remove();
-    },
+        },
+        removeOptions = function () {
+            $(this).find('.hoverDiv').remove();
+        },
         insertContacts = function (contact, position, that) {
             var number = $('.container'),
                 recordText = $('<div>')
