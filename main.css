@@ -22,8 +22,6 @@ h2 {
     float: left;
     font: message-box;
     font-size: 1.5em;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
 }
 .songTitle {
@@ -83,11 +81,14 @@ label abcad9
     height: 60px;
     background-color:#b8d8e6;
     margin: 15px auto;
+    overflow: hidden;
 }
 .record>div{
     padding:18px 18px 16px 18px;
     max-height: 27px;
     height: 27px;
+    overflow: hidden;
+    float: left;
 }
 .pic{
     width: 160px;

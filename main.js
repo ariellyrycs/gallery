@@ -2,17 +2,6 @@
  * Created by arobles on 7/28/14.
  */
 
-/*var IsValidImageUrl = function (url) {
- var img = img || new Image();
- img.src = url;
- console.dir(img.width);
- //alert(img.height != 0);
- }*
- */
-
-
-
-
 var createContent = (function ($){
     var elementId = 0,
         defaultInfo = {
@@ -22,6 +11,9 @@ var createContent = (function ($){
         },
         parse_url = function (url) {
             return /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/.test(url);
+        },
+        matchTime = function (time) {
+            return /^([0-9]{1,2}):([0-9]{2})$/.test(time);
         },
         refreshAttr = function () {
             var elements = $('.container')[0].childNodes,
@@ -121,6 +113,7 @@ var createContent = (function ($){
                     input.clone()
                         .find('input')
                         .attr('placeholder', 'Time')
+                        .val('00:00')
                         .end(),
                     input.clone()
                         .find('input')
@@ -136,7 +129,7 @@ var createContent = (function ($){
                     info['name'] = e.target[1].value;
                     info['time'] = e.target[2].value;
                     info['img'] = e.target[3].value;
-                    if(info.img === '' || info.name === '' || !parse_url(info.img) || !typeof info.name === 'string' || isNaN(parseInt(info.time))) {
+                    if(info.img === '' || info.name === '' || !parse_url(info.img) || !typeof info.name === 'string' || !matchTime(info.time)) {
                         alert('incorrect');
                         return;
                     }
@@ -148,6 +141,7 @@ var createContent = (function ($){
                         .html(info['time'])
                         .end()
                         .find('.pic')
+                        .attr('onError','this.src = "default.png"')
                         .attr('src', info['img']);
                     $(e.target.parentNode.nextSibling).css('display', 'block');
                     $(e.currentTarget.parentNode).remove();
@@ -183,25 +177,26 @@ var createContent = (function ($){
         refreshAttr: refreshAttr
     }
 }(jQuery));
-$.ajax({
-    url: "local.json",
-    success: function (data) {
-        var contacts = data.contacts;
-        for (var contact in contacts){
-            if(contacts.hasOwnProperty(contact)){
-                contacts[contact].img = 'img/' + contacts[contact].img;
-                createContent.insertContacts(contacts[contact]);
-            }
-        }
-    }
-});
 
-$(document).ready(function() {
+
+(function($) {
     var $dragging = null,
         offset_y,
         offset_x,
         coordinates = [],
         indexPos;
+    $.ajax({
+        url: "local.json",
+        success: function (data) {
+            var contacts = data.contacts;
+            for (var contact in contacts){
+                if(contacts.hasOwnProperty(contact)){
+                    contacts[contact].img = 'img/' + contacts[contact].img;
+                    createContent.insertContacts(contacts[contact]);
+                }
+            }
+        }
+    });
     $(document.body).on("mousemove", function(e) {
         if ($dragging) {
             $dragging.offset({
@@ -234,7 +229,7 @@ $(document).ready(function() {
     $(document.body).on("mouseup", function (e) {
         $(document.body).css('cursor', 'default');
         for (var i in coordinates) {
-            if(coordinates.hasOwnProperty(i)){
+            if(coordinates.hasOwnProperty(i)) {
                 if (e.pageX >= coordinates[i].left && e.pageX <= coordinates[i].right) {
                     if (e.pageY >= coordinates[i].top && e.pageY <= coordinates[i].bottom) {
                         if(i < indexPos) {
@@ -251,4 +246,4 @@ $(document).ready(function() {
         coordinates = [];
         $dragging = null;
     });
-});
+}(jQuery));
