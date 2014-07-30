@@ -293,19 +293,10 @@
         }
     });
     $(document.body).on("mouseup", function (e) {
-        $('.aux').remove();
         $(document.body).css('cursor', 'default');
-        for (var i in coordinates) {
-            if(coordinates.hasOwnProperty(i)) {
-                if (e.pageX >= coordinates[i].left && e.pageX <= coordinates[i].right) {
-                    if (e.pageY >= coordinates[i].top && e.pageY <= coordinates[i].bottom) {
-                        $($dragging).insertBefore($(coordinates[i].dom));
-                        $('.phantom').remove();
-                        createContent.refreshAttr();
-                    }
-                }
-            }
-        }
+        $($dragging).insertBefore($('.aux'));
+        createContent.refreshAttr();
+        $('.aux').remove();
         $('.phantom').remove();
         if($dragging) {
             $dragging.css('position', 'static');
