@@ -275,7 +275,6 @@
         };
     $(document.body).on("mousemove", function(e) {
         move(e.pageY ,e.pageX);
-        console.log(coordinates);
         for(var i =0; i < coordinates.length; i += 1){
             if (e.pageX >= coordinates[i].left && e.pageX <= coordinates[i].right) {
                 if (e.pageY >= coordinates[i].top && e.pageY <= coordinates[i].bottom) {
