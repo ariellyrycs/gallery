@@ -13,11 +13,11 @@
             return /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/.test(url);
         },
         matchTime = function (time) {
-            return /^([0-9]{1,2}):([0-9]{2})$/.test(time);
+            return /^([0-9]+):([0-5][0-9])$/.test(time);
         },
         refreshAttr = function () {
             var elements = $('.container')[0].childNodes,
-                lengthItem = elements.length + 3,
+                lengthItem = elements.length,
                 i,
                 level,
                 colors = {
@@ -26,20 +26,23 @@
                     3:'#5790ab',
                     4:'#4d8199'
                 };
-            for(i = 0; i < lengthItem; i += 1) {
-                level = (i < 14 )? Math.floor((i + 3)/3): 4;
+            for(i = 1; i < lengthItem; i += 1) {
+                level = (i < 14 )? Math.floor((i + 2)/3): 4;
                 $(elements[i]).css('background-color', colors[level]);
-                $(elements[i]).find('.songNumber').html(i + 1);
+                $(elements[i]).find('.songNumber').html(i);
             }
-            $('#no').html(lengthItem - 3);
+            lengthItem = lengthItem - 1;
+            $('#no').html((lengthItem == 1)? '1 song' :lengthItem + ' songs');
         },
         removeOptions = function () {
             $(this).find('.hoverDiv').remove();
+            $(this).find('marquee').attr('scrollamount', '0');
         },
         insertContacts = function (contact, position, that) {
             var number = $('.container'),
                 recordText = $('<div>')
                     .append($('<marquee>')
+                        .attr('scrollamount', '0')
                         .html('<span class="songNumber">' + (elementId + 1) + '</span>. <span class="songTitle">' + contact.title +
                             '</span> - <span class="songTime">' + contact.time  + '</span>')),
                 record = $('<div>')
@@ -57,7 +60,7 @@
                     .addClass('contentInfo')
                     .addClass('movement')
                     .append(record, imgDiv),
-                content = $('<div>')
+                content = $('<li>')
                     .attr('id', elementId)
                     .addClass('content')
                     .append(displayInfo)
@@ -78,11 +81,14 @@
         },
         dblClickContent = function () {
             var close,
-                fieldset,
+                fieldSet,
                 form,
                 edit,
                 input,
-                button;
+                button,
+                songName = $(this).find(".songTitle")[0].childNodes[0].data,
+                songTime_ = $(this).find(".songTime")[0].childNodes[0].data,
+                pic = $(this).find('.pic').attr('src');
             if($(this).find('.contentInfo').length !== 1){
                 return;
             }
@@ -100,25 +106,27 @@
                     .append( $('<button>')
                         .addClass('form-control')
                         .attr('type', 'submit')
-                        .text('add'));
+                        .text('Add'));
             input.append($('<input>')
                 .addClass('form-control')
                 .attr('type', 'text'));
-            fieldset = $('<fieldset>')
+            fieldSet = $('<fieldset>')
                 .append(input.clone()
                     .find('input')
                     .attr('placeholder', 'Title')
                     .attr('type', 'text')
+                    .val((songName === defaultInfo.title)? '' :songName)
                     .end(),
                     input.clone()
                         .find('input')
                         .attr('placeholder', 'Time')
-                        .val('00:00')
+                        .val((songTime_ === defaultInfo.time)? '00:00' : songTime_)
                         .end(),
                     input.clone()
                         .find('input')
                         .attr('placeholder', 'Image Url')
                         .attr('type', 'url')
+                        .val((pic === defaultInfo.img)? '': pic)
                         .end(),
                     button
                 );
@@ -146,7 +154,7 @@
                     $(e.target.parentNode.nextSibling).css('display', 'block');
                     $(e.currentTarget.parentNode).remove();
 
-                }).append(fieldset);
+                }).append(fieldSet);
             edit = $('<div>')
                 .addClass('contentInfo')
                 .append(close, form);
@@ -171,10 +179,14 @@
                     insertContacts(defaultInfo, 'after', this);
                 }));
         $(this).append(icons);
+        //create movement :marquee
+        $(this).find('marquee').attr('scrollamount', '6');
     }
     return {
         insertContacts: insertContacts,
-        refreshAttr: refreshAttr
+        refreshAttr: refreshAttr,
+        createOptions: createOptions,
+        dblClickContent: dblClickContent
     }
 }(jQuery));
 
@@ -195,54 +207,111 @@
         offset_y,
         offset_x,
         coordinates = [],
-        indexPos;
-    $(document.body).on("mousemove", function(e) {
-        if ($dragging) {
-            $dragging.offset({
-                top: e.pageY - offset_y,
-                left: e.pageX - offset_x
-            });
-        }
-    });
-    $(document.body).on("mousedown", ".movement", function (e) {
-        $dragging = $(e.target.parentNode);
-        $dragging.find('.hoverDiv').remove();
-        $dragging.css('z-index', '10');
-        $(document.body).css('cursor', 'move');
-        offset_x = e.offsetX;
-        offset_y = e.offsetY;
-        $(".content").each(function() {
-            var lefttop = $(this).offset();
+        auxIndex,
+        indexPos,
+        alreadyClickedTimeOut,
+        alreadyClicked = false,
+        addCoordinates= function() {
+            var leftTop = $(this).offset();
             coordinates.push({
                 dom: $(this),
-                left: lefttop.left,
-                top: lefttop.top,
-                right: lefttop.left + $(this).width(),
-                bottom: lefttop.top + $(this).height()
+                left: leftTop.left,
+                top: leftTop.top,
+                right: leftTop.left + $(this).width(),
+                bottom: leftTop.top + $(this).height()
             });
             if($dragging[0].id === this.id) {
                 indexPos = coordinates.length - 1;
             }
-        });
+        },
+        move = function (pageY, pageX) {
+            if ($dragging) {
+                $dragging.offset({
+                    top: pageY - offset_y,
+                    left: pageX - offset_x
+                });
+            }
+        },
+        addAux = function (element, i) {
+            $('.container>.aux').remove();
+            if(i <= indexPos) {
+                $('<ol>').addClass('aux').insertBefore(element);
+            } else {
+                $('<ol>').addClass('aux').insertBefore(element);
+            }
+
+        },
+        wasDoubleClicked = function () {
+            var el = $(this);
+            if (alreadyClicked) {
+                alreadyClicked = false; // reset
+                clearTimeout(alreadyClickedTimeOut); // prevent this from happening
+                // do what needs to happen on double click.
+                return true;
+            }else{
+                alreadyClicked = true;
+                alreadyClickedTimeOut = setTimeout(function(){
+                    alreadyClicked = false; // reset when it happens
+                },300); //dblclick tolerance here
+            }
+        },
+        singleClick = function (e) {
+            //delete hover
+            $dragging = $(e.target.parentNode);
+            // cursor coordinates
+            offset_x = e.offsetX;
+            offset_y = e.offsetY;
+            //style
+            $dragging.css('z-index', '10');
+            $(document.body).css('cursor', 'move');
+            $($dragging).css('position', 'absolute');
+            $('.container').append($('<li>').addClass('phantom'));
+            //start moving
+            move(e.pageY, e.pageX);
+            //add Coordinates to variable
+            $(".content").each(addCoordinates);
+            addCoordinates.call($('.phantom'));
+            addAux(e.target.parentNode.nextSibling);
+        };
+    $(document.body).on("mousemove", function(e) {
+        move(e.pageY ,e.pageX);
+        console.log(coordinates);
+        for(var i =0; i < coordinates.length; i += 1){
+            if (e.pageX >= coordinates[i].left && e.pageX <= coordinates[i].right) {
+                if (e.pageY >= coordinates[i].top && e.pageY <= coordinates[i].bottom) {
+                    if(auxIndex !== i) {
+                        addAux(coordinates[i].dom, i);
+                        auxIndex = i;
+                    }
+
+                }
+            }
+        }
+    });
+    $(document.body).on("mousedown", ".movement", function (e) {
+        if(!wasDoubleClicked.call(this)) {
+            singleClick(e);
+        }
     });
     $(document.body).on("mouseup", function (e) {
+        $('.aux').remove();
         $(document.body).css('cursor', 'default');
         for (var i in coordinates) {
             if(coordinates.hasOwnProperty(i)) {
                 if (e.pageX >= coordinates[i].left && e.pageX <= coordinates[i].right) {
                     if (e.pageY >= coordinates[i].top && e.pageY <= coordinates[i].bottom) {
-                        if(i < indexPos) {
-                            $($dragging).insertBefore($('#' + coordinates[i].dom[0].id));
-                        } else if(i > indexPos) {
-                            $($dragging).insertAfter($('#' + coordinates[i].dom[0].id));
-                        }
+                        $($dragging).insertBefore($(coordinates[i].dom));
+                        $('.phantom').remove();
                         createContent.refreshAttr();
                     }
                 }
             }
         }
-        $dragging.css('position', 'static');
+        $('.phantom').remove();
+        if($dragging) {
+            $dragging.css('position', 'static');
+            $dragging = null;
+        }
         coordinates = [];
-        $dragging = null;
     });
 }(jQuery));
