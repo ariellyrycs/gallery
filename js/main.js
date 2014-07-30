@@ -137,16 +137,17 @@
                     info['name'] = e.target[1].value;
                     info['time'] = e.target[2].value;
                     info['img'] = e.target[3].value;
-                    if(info.img === '' || info.name === '' || !parse_url(info.img) || !typeof info.name === 'string' || !matchTime(info.time)) {
+                    if((!parse_url(info.img) && info.img !== '') || !matchTime(info.time)) {
                         alert('incorrect');
                         return;
                     }
+
                     $(e.target.parentNode.nextSibling)
                         .find('.songTitle')
-                        .html(info['name'])
+                        .html(info['name'] || defaultInfo.name)
                         .end()
                         .find('.songTime')
-                        .html(info['time'])
+                        .html((info['time'] === '00:00')? defaultInfo.time :info['time'])
                         .end()
                         .find('.pic')
                         .attr('onError','this.src = "css/img/default.png"')
@@ -295,9 +296,9 @@
     $(document.body).on("mouseup", function (e) {
         $(document.body).css('cursor', 'default');
         $($dragging).insertBefore($('.aux'));
-        createContent.refreshAttr();
         $('.aux').remove();
         $('.phantom').remove();
+        createContent.refreshAttr();
         if($dragging) {
             $dragging.css('position', 'static');
             $dragging = null;
