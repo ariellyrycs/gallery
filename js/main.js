@@ -16,7 +16,7 @@
             return /^([0-9]+):([0-5][0-9])$/.test(time);
         },
         refreshAttr = function () {
-            var elements = $('.container')[0].childNodes,
+            var elements = $('.content'),
                 lengthItem = elements.length,
                 i,
                 level,
@@ -26,16 +26,17 @@
                     3:'#5790ab',
                     4:'#4d8199'
                 };
-            for(i = 1; i < lengthItem; i += 1) {
-                level = (i < 14 )? Math.floor((i + 2)/3): 4;
+            for(i = 0; i < lengthItem; i += 1) {
+                level = (i < 14 )? Math.floor((i + 3)/3): 4;
                 $(elements[i]).css('background-color', colors[level]);
-                $(elements[i]).find('.songNumber').html(i);
+                $(elements[i]).find('.songNumber').html(i + 1);
             }
-            lengthItem = lengthItem - 1;
-            $('#no').html((lengthItem == 1)? '1 song' :lengthItem + ' songs');
+            $('#no').html((lengthItem === 1)? '1 song' :lengthItem + ' songs');
         },
         removeOptions = function () {
             $(this).find('.hoverDiv').remove();
+            console.log($(this).find('marquee'));
+            $(this).find('marquee')[0].scrollLeft = 0;
             $(this).find('marquee').attr('scrollamount', '0');
         },
         insertContacts = function (contact, position, that) {
@@ -68,7 +69,7 @@
                     .mouseenter(createOptions)
                     .mouseleave(removeOptions);
             if(position && that){
-                if(position === 'before'){
+                if(position === 'before') {
                     $(content).insertBefore($('#' + that.parentNode.parentNode.id));
                 }else if(position === 'after') {
                     $('#' + that.parentNode.parentNode.id ).after( $(content) );
@@ -175,6 +176,15 @@
                 .click(function () {
                     this.parentNode.parentNode.remove();
                     refreshAttr();
+                    if($('.container')[0].childNodes.length === 1) {
+                        $('<il>')
+                            .addClass('addFirst')
+                            .appendTo('.container')
+                            .click(function () {
+                                insertContacts(defaultInfo);
+                                $('.addFirst').remove();
+                            });
+                    }
                 }), $('<div>')
                 .click(function () {
                     insertContacts(defaultInfo, 'after', this);
@@ -203,7 +213,7 @@
 }(data));
 
 
-(function($) {
+(function($) { //delegation
     var $dragging = null,
         offset_y,
         offset_x,
@@ -243,7 +253,6 @@
 
         },
         wasDoubleClicked = function () {
-            var el = $(this);
             if (alreadyClicked) {
                 alreadyClicked = false; // reset
                 clearTimeout(alreadyClickedTimeOut); // prevent this from happening
@@ -266,7 +275,7 @@
             $dragging.css('z-index', '10');
             $(document.body).css('cursor', 'move');
             $($dragging).css('position', 'absolute');
-            $('.container').append($('<li>').addClass('phantom'));
+            $('<il>').addClass('phantom').appendTo('.container');
             //start moving
             move(e.pageY, e.pageX);
             //add Coordinates to variable
@@ -294,8 +303,8 @@
         }
     });
     $(document.body).on("mouseup", function (e) {
-        $(document.body).css('cursor', 'default');
         $($dragging).insertBefore($('.aux'));
+        $(document.body).css('cursor', 'default');
         $('.aux').remove();
         $('.phantom').remove();
         createContent.refreshAttr();
